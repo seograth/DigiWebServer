@@ -9,8 +9,6 @@ const char* password = "12345678";
 
 ESP8266WebServer server(80);
 
-const int led = 13;
-
 void writeString(String stringData) { // Used to serially push out a String with Serial.write()
 
   for (int i = 0; i < stringData.length(); i++)
@@ -21,7 +19,6 @@ void writeString(String stringData) { // Used to serially push out a String with
 }
 
 void handleRoot() {
-  digitalWrite(led, 1);
   String msg = "hello from ESP8266!\n\n";
   msg += "Instructions:\n";
   msg += "/w -> Write a value to the RDAC of a Digipot. [POST]\n";
@@ -34,11 +31,9 @@ void handleRoot() {
   msg += "e.g. /w & req body: `1 24000` -> write to digipot in pos 1 the \nresistance value 24000 ohm.";
   
   server.send(200, "text/plain", msg);
-  digitalWrite(led, 0);
 }
 
 void handleWrite() {
-  digitalWrite(led, 1);
   String res = "Write to Digipot\n\n";
   String cmd = "";
   res += "URI: ";
@@ -50,63 +45,68 @@ void handleWrite() {
   for(uint8_t i=0; i < server.args(); i++) {
     res += " " + server.argName(i) + ": " + server.arg(i) + "\n";
     cmd += server.arg(i);
-    Serial.println(server.arg(i));
+    // Serial.println(server.arg(i));
   }
   writeString(cmd);
   server.send(200, "text/plain", res);
-  digitalWrite(led, 0);
 }
 
 void handleRead() {
-  digitalWrite(led, 1);
-  String cmd = "Read Digipot\n\n";
-  cmd += "URI: ";
+  String res = "Read Digipot\n\n";
+  String cmd = "";
+  res += "URI: ";
+  res += server.uri();
   cmd += server.uri();
-  cmd += "\nArguments: ";
-  cmd += server.args();
-  cmd += "\n";
+  res += "\nArguments: ";
+  res += server.args();
+  res += "\n";
   for(uint8_t i=0; i < server.args(); i++) {
-    cmd += " " + server.argName(i) + ": " + server.arg(i) + "\n";
-    Serial.println(server.arg(i));
+    res += " " + server.argName(i) + ": " + server.arg(i) + "\n";
+    cmd += server.arg(i);
+    // Serial.println(server.arg(i));
   }
-  server.send(200, "text/plain", cmd);
-  digitalWrite(led, 0);
+  writeString(cmd);
+  //TODO kane kati me to diavasma
+  server.send(200, "text/plain", res);
 }
 
 void handleStore() {
-  digitalWrite(led, 1);
-  String cmd = "Read Digipot\n\n";
-  cmd += "URI: ";
+  String res = "Read Digipot\n\n";
+  Strind cmd = ""
+  res += "URI: ";
+  res += server.uri();
   cmd += server.uri();
-  cmd += "\nArguments: ";
-  cmd += server.args();
-  cmd += "\n";
+  res += "\nArguments: ";
+  res += server.args();
+  res += "\n";
   for(uint8_t i=0; i < server.args(); i++) {
-    cmd += " " + server.argName(i) + ": " + server.arg(i) + "\n";
-    Serial.println(server.arg(i));
+    res += " " + server.argName(i) + ": " + server.arg(i) + "\n";
+    cmd += server.arg(i);
+    // Serial.println(server.arg(i));
   }
-  server.send(200, "text/plain", cmd);
-  digitalWrite(led, 0);
+  writeString(cmd);
+  server.send(200, "text/plain", res);
 }
 
 void handleReset() {
-  digitalWrite(led, 1);
-  String cmd = "Read Digipot\n\n";
-  cmd += "URI: ";
+  String res = "Read Digipot\n\n";
+  String cmd = "";
+  res += "URI: ";
+  res += server.uri();
   cmd += server.uri();
-  cmd += "\nArguments: ";
-  cmd += server.args();
-  cmd += "\n";
+  res += "\nArguments: ";
+  res += server.args();
+  res += "\n";
   for(uint8_t i=0; i < server.args(); i++) {
-    cmd += " " + server.argName(i) + ": " + server.arg(i) + "\n";
-    Serial.println(server.arg(i));
+    res += " " + server.argName(i) + ": " + server.arg(i) + "\n";
+    cmd += server.arg(i);
+    // Serial.println(server.arg(i));
   }
-  server.send(200, "text/plain", cmd);
-  digitalWrite(led, 0);
+  writeString(cmd);
+  server.send(200, "text/plain", res);
 }
 
 void handleNotFound() {
-  digitalWrite(led, 1);
   String msg = "You tried to type something forbidden try again reading the instructions.\n\n";
   msg += "URI: ";
   msg += server.uri();
@@ -117,13 +117,10 @@ void handleNotFound() {
     msg += " " + server.argName(i) + ": " + server.arg(i) + "\n";
     }
   server.send(404, "text/plain", msg);
-  digitalWrite(led, 0);
 }
 
 void setup() {
   delay(1000);
-  pinMode(led, OUTPUT);
-  digitalWrite(led, 0);
   Serial.begin(9600);
 
   WiFi.softAP(ssid, password);
@@ -141,7 +138,7 @@ void setup() {
   server.onNotFound(handleNotFound);
 
   server.begin();
-  Serial.println("AP started");
+  // Serial.println("AP started");
 }
 
 void loop() {
