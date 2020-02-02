@@ -24,11 +24,12 @@ void handleRoot() {
   msg += "/w -> Write a value to the RDAC of a Digipot. [POST]\n";
   msg += "/r -> Read the RDAC res. value of a Digipot. [GET]\n";
   msg += "/s -> Store the RDAC res. value to memory. [POST]\n";
-  msg += "/q -> Reset the Digipot to the stored RDAC res. value. [POST]\n\n\n\n";
+  msg += "/q -> Reset the Digipot to the stored RDAC res. value. [POST]\n";
+  msg += "/f -> Change the functionality of the operational amplifier. [POST]\n\n\n\n";
   msg += "After [GET] command letter add `?`, the position number of digipot you want to interact.\n";
   msg += "e.g. /r?2       -> read the resistance value of Digipot in position 2.\n\n\n";
   msg += "After [POST] command letter add as request body a string with 1st digit the \nposition of Digipot and next the value you want to write to RDAC.\n";
-  msg += "e.g. /w & req body: `1 24000` -> write to digipot in pos 1 the \nresistance value 24000 ohm.";
+  msg += "e.g. /w & req body: `w 1 24000` -> write to digipot in pos 1 the \nresistance value 24000 ohm.";
   
   server.send(200, "text/plain", msg);
 }
@@ -106,6 +107,24 @@ void handleReset() {
   server.send(200, "text/plain", res);
 }
 
+void handleFunction() {
+  String res = "Modify the functionality of op-amp:\n\n";
+  String cmd = "";
+  res += "URI: ";
+  res += server.uri();
+  cmd += server.uri();
+  res += "\nArguments: ";
+  res += server.args();
+  res += "\n";
+  for(uint8_t i=0; i < server.args(); i++) {
+    res += " " + server.argName(i) + ": " + server.arg(i) + "\n";
+    cmd += server.arg(i);
+    // Serial.println(server.arg(i));
+  }
+  writeString(cmd);
+  server.send(200, "text/plain", res);
+}
+
 void handleNotFound() {
   String msg = "You tried to type something forbidden try again reading the instructions.\n\n";
   msg += "URI: ";
@@ -134,6 +153,7 @@ void setup() {
   server.on("/r", HTTP_GET, handleRead);
   server.on("/s", HTTP_POST, handleStore);
   server.on("/q", HTTP_POST, handleReset);
+  server.on("/f", HTTP_POST, handleFunction);
 
   server.onNotFound(handleNotFound);
 
