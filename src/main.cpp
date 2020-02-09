@@ -73,7 +73,7 @@ void handleRead() {
 
 void handleStore() {
   String res = "Read Digipot\n\n";
-  Strind cmd = ""
+  String cmd = "";
   res += "URI: ";
   res += server.uri();
   cmd += server.uri();
